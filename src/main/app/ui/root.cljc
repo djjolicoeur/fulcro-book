@@ -13,7 +13,8 @@
 
 (defsc Person
   [this {:keys [person/name person/age]}]
-  {:initial-state
+  {:query [:person/name :person/age]
+   :initial-state
    (fn [{:keys [name age] :as params}] {:person/name name :person/age age})}
   (dom/li nil
           (dom/h5 nil name  (str "(age: " age ")"))))
@@ -21,7 +22,8 @@
 (def ui-person (prim/factory Person {:keyfn :person/name}))
 
 (defsc PersonList [this {:keys [person-list/label person-list/people]}]
-  {:initial-state
+  {:query [:person-list/label {:person-list/people (prim/get-query Person)}]
+   :initial-state
    (fn [{:keys [label]}]
      {:person-list/label label
       :person-list/people (if (= label "Friends")
@@ -43,7 +45,10 @@
 
 
 (defsc Root [this {:keys [ui/react-key friends enemies]}]
-  {:initial-state
+  {:query [:ui/react-key
+           {:friends (prim/get-query PersonList)}
+           {:enemies (prim/get-query PersonList)}]
+   :initial-state
    (fn [params]
      {:friends (prim/get-initial-state PersonList {:label "Friends"})
       :enemies (prim/get-initial-state PersonList {:label "Enemies"})})}
