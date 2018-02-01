@@ -12,12 +12,13 @@
 ;; The main UI of your application
 
 (defsc Person
-  [this {:keys [person/name person/age]}]
+  [this {:keys [person/name person/age]} {:keys [onDelete]}]
   {:query [:person/name :person/age]
    :initial-state
    (fn [{:keys [name age] :as params}] {:person/name name :person/age age})}
   (dom/li nil
-          (dom/h5 nil name  (str "(age: " age ")"))))
+          (dom/h5 nil name (str "(age: " age ")")
+                  (dom/button #js {:onClick #(onDelete name)} "X"))))
 
 (def ui-person (prim/factory Person {:keyfn :person/name}))
 
@@ -36,10 +37,15 @@
                              (prim/get-initial-state Person
                                                      {:name "Bobby"
                                                       :age 55})])})}
-  (dom/div nil
-           (dom/h4 nil label)
-           (dom/ul nil
-                   (map ui-person people))))
+  (let [delete-person (fn [name] (println label " asked to delete " name))]
+      (dom/div nil
+               (dom/h4 nil label)
+               (dom/ul nil
+                       (map (fn [p]
+                              (ui-person
+                               (prim/computed p
+                                              {:onDelete delete-person})))
+                            people)))))
 
 (def ui-person-list (prim/factory PersonList))
 
