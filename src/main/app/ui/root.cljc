@@ -37,7 +37,10 @@
                              (prim/get-initial-state Person
                                                      {:name "Bobby"
                                                       :age 55})])})}
-  (let [delete-person (fn [name] (println label " asked to delete " name))]
+  (let [delete-person (fn [name]
+                        (prim/transact! this
+                                        `[(api/delete-person {:list-name ~label
+                                                              :name ~name})]))]
       (dom/div nil
                (dom/h4 nil label)
                (dom/ul nil
