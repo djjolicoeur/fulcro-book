@@ -9,13 +9,11 @@
 
 (defmutation delete-person
   "Deletes person name from list list-name"
-  [{:keys [list-name name]}]
+  [{:keys [list-id person-id]}]
   (action [{:keys [state]}]
-          (let [path (if (= "Friends" list-name)
-                       [:friends :person-list/people]
-                       [:enemies :person-list/people])
-                old-list (get-in @state path)
-                new-list (vec (filter
-                               #(not= name (:person/name %)) old-list))]
-            (swap! state assoc-in path new-list))))
+          (let [ident-to-remove [:person/by-id person-id]
+                strip-fk (fn [old-fks]
+                           (vec (filter #(not= ident-to-remove %) old-fks)))]
+            (swap! state update-in
+                   [:person-list/by-id list-id :person-list/people] strip-fk))))
 
