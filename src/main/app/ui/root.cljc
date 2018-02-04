@@ -33,23 +33,7 @@
    (fn [{:keys [id label]}]
      {:db/id id
       :person-list/label label
-      :person-list/people (if (= label "Friends")
-                            [(prim/get-initial-state Person
-                                                     {:id 1
-                                                      :name "Sally"
-                                                      :age 32})
-                             (prim/get-initial-state Person
-                                                     {:id 2
-                                                      :name "Joe"
-                                                      :age 22})]
-                            [(prim/get-initial-state Person
-                                                     {:id 3
-                                                      :name "Fred"
-                                                      :age 11})
-                             (prim/get-initial-state Person
-                                                     {:id 4
-                                                      :name "Bobby"
-                                                      :age 55})])})}
+      :person-list/people []})}
   (let [delete-person (fn [person-id]
                         (prim/transact! this
                                         `[(api/delete-person
@@ -67,8 +51,10 @@
 (def ui-person-list (prim/factory PersonList))
 
 
-(defsc Root [this {:keys [ui/react-key friends enemies]}]
+(defsc Root
+  [this {:keys [ui/react-key friends enemies current-user]}]
   {:query [:ui/react-key
+           {:current-user (prim/get-query Person)}
            {:friends (prim/get-query PersonList)}
            {:enemies (prim/get-query PersonList)}]
    :initial-state
@@ -77,7 +63,8 @@
                                        {:id :friends :label "Friends"})
       :enemies (prim/get-initial-state PersonList
                                        {:id :enemies :label "Enemies"})})}
-    (dom/div #js {:key react-key}
+  (dom/div #js {:key react-key}
+           (dom/h4 nil (str "Current User: " (:person/name current-user)))
            (ui-person-list friends)
            (ui-person-list enemies)))
 
