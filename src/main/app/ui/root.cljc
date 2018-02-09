@@ -51,16 +51,38 @@
 
 (def ui-person-list (prim/factory PersonList))
 
+(defsc Post
+  [this {:keys [post/title post/body]}]
+  {:ident [:posts/by-id :db/id]
+   :query [:db/id :post/user-id :post/body :post/title]}
+  (dom/div nil
+           (dom/h4 nil title)
+           (dom/p nil body)))
+
+(def ui-post (prim/factory Post {:keyfn :db/id}))
+
+(defsc Posts
+  [this {:keys [posts]}]
+  {:initial-state {:posts []}
+   :ident (fn [] [:post-list/by-id :the-one])
+   :query [{:posts (prim/get-query Post)}]}
+  (dom/ul nil
+          (map ui-post posts)))
+
+(def ui-posts (prim/factory Posts))
+
 
 (defsc Root
-  [this {:keys [ui/react-key friends enemies current-user]}]
+  [this {:keys [ui/react-key blog-posts friends enemies current-user]}]
   {:query [:ui/react-key
            {:current-user (prim/get-query Person)}
+           {:blog-posts (prim/get-query Posts)}
            {:friends (prim/get-query PersonList)}
            {:enemies (prim/get-query PersonList)}]
    :initial-state
    (fn [params]
-     {:friends (prim/get-initial-state PersonList
+     {:blog-posts (prim/get-initial-state Posts {})
+      :friends (prim/get-initial-state PersonList
                                        {:id :friends :label "Friends"})
       :enemies (prim/get-initial-state PersonList
                                        {:id :enemies :label "Enemies"})})}
@@ -73,7 +95,9 @@
                                        Person))}
                        "Refresh Person with ID 3")
            (ui-person-list friends)
-           (ui-person-list enemies)))
+           (ui-person-list enemies)
+           (dom/h4 nil "Blog Posts")
+           (ui-posts blog-posts)))
 
 
 

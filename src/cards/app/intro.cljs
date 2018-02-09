@@ -3,7 +3,9 @@
             [app.api.mutations :as api]
             [app.ui.root :as root]
             [app.ui.components :as comp]
-            [fulcro.client.data-fetch :as df]))
+            [app.rest :as rest]
+            [fulcro.client.data-fetch :as df]
+            [fulcro.client.network :as net]))
 
 ;; (defcard SVGPlaceholder
 ;;   "# SVG Placeholder"
@@ -12,10 +14,16 @@
 (defcard-fulcro sample-app
   root/Root
   {}
-  {:inspect-data true
+  {:inspect-data false
    :fulcro
-   {:started-callback
+   {:networking
+    {:remote (net/make-fulcro-network "/api"
+                                      :global-error-callback (constantly nil))
+     :rest (rest/make-rest-network)}
+    :started-callback
     (fn [app]
+      (df/load app :posts root/Post {:remote :rest
+                                :target [:post-list/by-id :the-one :posts]})
       (df/load app :current-user root/Person)
       (df/load app
                :my-enemies
