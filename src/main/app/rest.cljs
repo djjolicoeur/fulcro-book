@@ -46,9 +46,9 @@
             edn (js->clj response)
             posts (mapv rekey-post edn)
             fixed-response {:posts posts}]
-        (js/console-log :converted-response fixed-response)
+        (js/console.log :converted-response fixed-response)
         (when (and response valid-data-callback)
-          (valid-data-callback response)))
+          (valid-data-callback fixed-response)))
       (finally (.dispose xhr-io))))
   (response-error [this xhr-io error-callback]
     (try
