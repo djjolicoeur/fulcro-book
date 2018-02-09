@@ -45,3 +45,7 @@
 (defquery-root :my-enemies
   (value [{:keys [query]} params]
          (get-people :enemy query)))
+
+(defquery-entity :person/by-id
+  (value [env id params]
+         (update (get @people-db id) :person/name str " (refreshed)")))

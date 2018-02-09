@@ -15,7 +15,8 @@
                 strip-fk (fn [old-fks]
                            (vec (filter #(not= ident-to-remove %) old-fks)))]
             (swap! state update-in
-                   [:person-list/by-id list-id :person-list/people] strip-fk))))
+                   [:person-list/by-id list-id :person-list/people] strip-fk)))
+  (remote [env] true))
 
 (defn sort-friends-by*
   [state-map field]

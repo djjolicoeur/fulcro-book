@@ -20,7 +20,8 @@
      {:db/id id :person/name name :person/age age})}
   (dom/li nil
           (dom/h5 nil name (str "(age: " age ")")
-                  (dom/button #js {:onClick #(onDelete id)} "X"))))
+                  (dom/button #js {:onClick #(onDelete id)} "X")
+                  (dom/button #js {:onClick #(df/refresh! this)} "Refresh"))))
 
 (def ui-person (prim/factory Person {:keyfn :person/name}))
 
@@ -65,6 +66,12 @@
                                        {:id :enemies :label "Enemies"})})}
   (dom/div #js {:key react-key}
            (dom/h4 nil (str "Current User: " (:person/name current-user)))
+           (dom/button #js {:onClick
+                            (fn []
+                              (df/load this
+                                       [:person/by-id 3]
+                                       Person))}
+                       "Refresh Person with ID 3")
            (ui-person-list friends)
            (ui-person-list enemies)))
 
